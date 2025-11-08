@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if form.instance.articulo_id %}Editar{% else %}Nuevo{% endif %} Artículo - Sistema POS
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="h3">
+    <i class="fas fa-{% if form.instance.articulo_id %}edit{% else %}plus{% endif %} me-2"></i>
+    {% if form.instance.articulo_id %}Editar{% else %}Nuevo{% endif %} Artículo
+  </h2>
+  <a href="{% url 'articulos_list' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-1"></i>Volver
+  </a>
+</div>
+
+<div class="card shadow">
+  <div class="card-header bg-white">
+    <h5 class="mb-0">Información del Artículo</h5>
+  </div>
+  <div class="card-body">
+    <form method="post" id="articuloForm" class="needs-validation" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        <ul class="mb-0">
+          {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Código de Artículo*</label>
+          {{ form.codigo_articulo }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Código de Barras</label>
+          {{ form.codigo_barras }}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Descripción*</label>
+        {{ form.descripcion }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Presentación</label>
+        {{ form.presentacion }}
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Grupo*</label>
+          {{ form.grupo }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Línea*</label>
+          {{ form.linea }}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Stock Inicial</label>
+        {{ form.stock }}
+      </div>
+
+      <hr class="my-4" />
+      <h5>Precios</h5>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Precio 1*</label>
+          {{ precio_form.precio_1 }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Precio 2</label>
+          {{ precio_form.precio_2 }}
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Precio 3</label>
+          {{ precio_form.precio_3 }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Precio 4</label>
+          {{ precio_form.precio_4 }}
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Precio de Compra*</label>
+          {{ precio_form.precio_compra }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Precio de Costo*</label>
+          {{ precio_form.precio_costo }}
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+        <button type="button" class="btn btn-outline-secondary me-md-2" onclick="history.back()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Artículo</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const grupoSelect = document.getElementById("{{ form.grupo.id_for_label }}");
+    const lineaSelect = document.getElementById("{{ form.linea.id_for_label }}");
+
+    if (grupoSelect && lineaSelect) {
+      grupoSelect.addEventListener("change", function () {
+        const grupoId = this.value;
+
+        if (grupoId) {
+          // 🔹 Llamada al endpoint AJAX existente
+          fetch(`/api/lineas-por-grupo/${grupoId}/`)
+            .then(response => response.json())
+            .then(data => {
+              // Vaciar las opciones anteriores
+              lineaSelect.innerHTML = '<option value="">Seleccione una línea</option>';
+
+              // Agregar las nuevas líneas
+              data.forEach(linea => {
+                const option = document.createElement("option");
+                option.value = linea.id;
+                option.textContent = linea.nombre;
+                lineaSelect.appendChild(option);
+              });
+            })
+            .catch(error => console.error("Error al cargar líneas:", error));
+        } else {
+          // Si se borra el grupo, limpiar las líneas
+          lineaSelect.innerHTML = '<option value="">Seleccione una línea</option>';
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

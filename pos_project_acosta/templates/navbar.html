@@ -1,0 +1,54 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <i class="fas fa-cash-register me-2"></i>Sistema POS
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
+            <i class="fas fa-home me-1"></i>Inicio
+          </a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="articulosDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-box me-1"></i>Artículos
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="articulosDropdown">
+            <li><a class="dropdown-item" href="{% url 'articulos_list' %}">Lista de Artículos</a></li>
+            <li><a class="dropdown-item" href="{% url 'articulo_create' %}">Nuevo Artículo</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'articulos_catalogo' %}">Catálogo</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="d-flex">
+        {% if user.is_authenticated %}
+          <div class="dropdown">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user me-1"></i>{{ user.get_full_name|default:user.username|truncatechars:20 }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle me-2"></i>Perfil</a></li>
+              <li><a class="dropdown-item" href="{% url 'settings' %}"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión</a>
+              </li>
+            </ul>
+          </div>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline-light">
+            <i class="fas fa-sign-in-alt me-1"></i>Iniciar sesión
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
